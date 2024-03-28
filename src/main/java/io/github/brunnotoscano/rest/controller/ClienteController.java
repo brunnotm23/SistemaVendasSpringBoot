@@ -3,6 +3,7 @@ package io.github.brunnotoscano.rest.controller;
 
 import io.github.brunnotoscano.domain.entity.Cliente;
 import io.github.brunnotoscano.domain.repository.Clientes;
+import io.swagger.annotations.*;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.http.HttpStatus;
@@ -14,6 +15,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/clientes")
+@Api("API Clientes")
 public class ClienteController {
 
     private Clientes clientes;
@@ -23,7 +25,14 @@ public class ClienteController {
     }
 
     @GetMapping("{id}")
-    public Cliente getClienteById( @PathVariable Integer id ){
+    @ApiOperation("Obter detalhes de um cliente pelo ID")
+    @ApiResponses(
+            {
+                    @ApiResponse(code = 200, message = "Cliente encontrado"),
+                    @ApiResponse(code = 404, message = "Não foi encontrado cliente com o ID informado")
+            }
+    )
+    public Cliente getClienteById( @PathVariable @ApiParam("Id do cliente") Integer id ){
         return clientes
                 .findById(id)
                 .orElseThrow( () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Cliente não encontrado"));
@@ -31,6 +40,13 @@ public class ClienteController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @ApiOperation("Salvar um cliente na base de dados")
+    @ApiResponses(
+            {
+                    @ApiResponse(code = 201, message = "Cliente salvo com sucesso"),
+                    @ApiResponse(code = 400, message = "Erro de validação")
+            }
+    )
     public Cliente save ( @RequestBody @Valid Cliente cliente){
         return clientes.save(cliente);
     }
